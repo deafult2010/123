@@ -1,7 +1,10 @@
 var socket;
 
 var blob;
+var food;
 
+var Nfoods = [];
+var foods = [];
 var blobs = [];
 var zoom = 1;
 
@@ -11,36 +14,31 @@ function setup() {
   socket = io.connect('http://localhost:3000');
 
   blob = new Blob(random(width), random(height), random(8, 24));
-  // for (var i = 0; i < 100; i++) {
-  //   var x = random(-width, width);
-  //   var y = random(-height, height);
-  //   blobs[i] = new Blob(x, y, 16);
-  // }
+  for (var i = 0; i < 10; i++) {
+    var x = random(-width, width);
+    var y = random(-height, height);
+    Nfoods[i] = new Food(x, y, 10);
+    var dataF = {
+      x: Nfoods[i].pos.x,
+      y: Nfoods[i].pos.y,
+      r: Nfoods[i].r
+    };
+    socket.emit('initFood', dataF);
+  }
 
-  console.log('Sending: ' + mouseX + ',' + mouseY);
+  food = new Food(random(width), random(height), 10);
 
   var data = {
     x: blob.pos.x,
     y: blob.pos.y,
     r: blob.r
   };
+
   socket.emit('start', data);
 
-  socket.on('heartbeat', function(data) {
+  socket.on('heartbeat', function(data, data2) {
     blobs = data;
-  });
-
-  // var elementPos = blobs
-  //   .map(function(x) {
-  //     return x.id;
-  //   })
-  //   .indexOf(socket.id);
-
-  // console.log(elementPos);
-  socket.on('disconnect', function() {
-    console.log('Client has disconnected');
-    // blobs.splice(elementPos, 1);
-    // console.log(blobs);
+    foods = data2;
   });
 
   //disables "context menu" on right click for the canvas
@@ -68,14 +66,21 @@ function draw() {
       textAlign(CENTER);
       textSize(4);
       text(blobs[i].id, blobs[i].x, blobs[i].y + blobs[i].r * 1.5);
-      // blobs[i].show();
-      // if (blob.eats(blobs[i])) {
-      //   blobs.splice(i, 1);
-      // }
     }
   }
 
-  blob.show();
+  for (var i = foods.length - 1; i >= 0; i--) {
+    fill(255, 0, 0);
+    ellipse(foods[i].x, foods[i].y, foods[i].r);
+
+    if (blob.eats(foods[i])) {
+      var data2 = i;
+      foods.splice(i, 1);
+    }
+  }
+
+  var color = [255, 255, 255];
+  blob.show(color);
   if (mouseIsPressed) {
     blob.update();
   }
@@ -86,15 +91,9 @@ function draw() {
     y: blob.pos.y,
     r: blob.r
   };
-  socket.emit('update', data);
+  socket.emit('update', data, data2);
 
-  var elementPos = blobs
-    .map(function(x) {
-      return x.id;
-    })
-    .indexOf(socket.id);
-
-  // console.log(blobs);
+  data2 = null;
 }
 
 // if (document.addEventListener) {

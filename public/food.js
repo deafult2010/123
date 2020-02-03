@@ -1,4 +1,4 @@
-function Blob(x, y, r) {
+function Food(x, y, r) {
   this.pos = createVector(x, y);
   this.r = r;
   this.vel = createVector(0, 0);
@@ -12,20 +12,21 @@ function Blob(x, y, r) {
   };
 
   this.eats = function(other) {
-    other.pos = createVector(other.x, other.y);
-    var d = p5.Vector.dist(this.pos, other.pos);
-    if (d < this.r + other.r) {
-      var sum = PI * this.r * this.r + PI * other.r * other.r;
-      this.r = sqrt(sum / PI);
-      return true;
-    } else {
-      return false;
-    }
+    console.log(other + '123');
+    // var d = p5.Vector.dist(this.pos, other.pos);
+    // console.log(d + '123');
+    // if (d < this.r + other.r) {
+    //   var sum = PI * this.r * this.r + PI * other.r * other.r;
+    //   this.r = sqrt(sum / PI);
+    //   return true;
+    // } else {
+    //   return false;
+    // }
   };
 
   this.constrain = function() {
-    blob.pos.x = constrain(blob.pos.x, -width, width);
-    blob.pos.y = constrain(blob.pos.y, -height, height);
+    food.pos.x = constrain(food.pos.x, -width, width);
+    food.pos.y = constrain(food.pos.y, -height, height);
   };
 
   this.show = function(color) {
