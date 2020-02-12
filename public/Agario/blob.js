@@ -14,9 +14,19 @@ function Blob(x, y, r) {
   this.eats = function(other) {
     other.pos = createVector(other.x, other.y);
     var d = p5.Vector.dist(this.pos, other.pos);
-    if (d < this.r + other.r) {
+    if (d < this.r + other.r && this.r > other.r) {
       var sum = PI * this.r * this.r + PI * other.r * other.r;
       this.r = sqrt(sum / PI);
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  this.eaten = function(other) {
+    other.pos = createVector(other.x, other.y);
+    var d = p5.Vector.dist(this.pos, other.pos);
+    if (d < this.r + other.r && this.r < other.r) {
       return true;
     } else {
       return false;
@@ -31,5 +41,9 @@ function Blob(x, y, r) {
   this.show = function(color) {
     fill(color);
     ellipse(this.pos.x, this.pos.y, this.r * 2, this.r * 2);
+  };
+
+  this.counter = function() {
+    return Math.round(blob.r);
   };
 }
